@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ham Ses Linki Al</title>
+</head>
+<body>
+    <h1>Ham Ses Linki Al</h1>
+    <form id="linkForm">
+        <input type="text" id="urlInput" placeholder="YouTube linki girin" size="50">
+        <button type="submit">Gönder</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+        const form = document.getElementById('linkForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const url = document.getElementById('urlInput').value;
+            const result = document.getElementById('result');
+            result.textContent = 'Yükleniyor...';
+
+            const formData = new FormData();
+            formData.append('url', url);
+
+            const response = await fetch('/get_audio', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                result.textContent = 'Hata: ' + data.error;
+            } else {
+                result.innerHTML = `Başlık: ${data.title}<br>Ham Link: <a href="${data.audio_url}" target="_blank">Tıkla</a>`;
+            }
+        });
+    </script>
+</body>
+</html>
