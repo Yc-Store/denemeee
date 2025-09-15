@@ -17,16 +17,20 @@ def get_audio():
         'format': 'bestaudio/best',
         'quiet': True,
         'skip_download': True,  # Sadece info alıyoruz
+        'noplaylist': True,     # Playlist yerine tek video
     }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
+            # Eğer video oturum veya captcha istiyorsa hata verir
+            if 'url' not in info:
+                return jsonify({'error': 'Bu video çerez veya giriş gerektiriyor.'}), 403
             audio_url = info['url']
             title = info.get('title', 'Unknown')
         return jsonify({'audio_url': audio_url, 'title': title})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': 'Link alınamadı: ' + str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
